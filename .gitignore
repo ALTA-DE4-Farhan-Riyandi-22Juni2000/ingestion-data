@@ -1,2 +1,2 @@
 .DS_Store
-ingestion_data/postgres-data/
+ingestion_data/postgres-data/.venv/

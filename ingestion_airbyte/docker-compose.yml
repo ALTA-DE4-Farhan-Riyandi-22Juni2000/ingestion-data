@@ -2,12 +2,11 @@ version: '3'
 
 x-logging: &default-logging
   options:
-    max-size: "100m"
-    max-file: "5"
+    max-size: '100m'
+    max-file: '5'
   driver: json-file
 
 services:
-  
   #############################################################################
   # Airbyte
   #############################################################################
@@ -133,7 +132,7 @@ services:
       - workspace:${WORKSPACE_ROOT}
       - ${LOCAL_ROOT}:${LOCAL_ROOT}
     ports:
-      - "9000"
+      - '9000'
     networks:
       - airbyte_internal
     depends_on:
@@ -184,7 +183,7 @@ services:
       - WORKER_ENVIRONMENT=${WORKER_ENVIRONMENT}
       - WORKSPACE_ROOT=${WORKSPACE_ROOT}
     ports:
-      - "8001"
+      - '8001'
     configs:
       - flags
     volumes:
@@ -269,7 +268,7 @@ services:
     container_name: airbyte-api-server
     restart: unless-stopped
     ports:
-      - "8006"
+      - '8006'
     environment:
       - AIRBYTE_VERSION=${VERSION}
       - DEPLOYMENT_MODE=${DEPLOYMENT_MODE}
@@ -304,10 +303,10 @@ services:
     container_name: airbyte-proxy
     restart: unless-stopped
     ports:
-      - "8000:8000"
-      - "8001:8001"
-      - "8003:8003"
-      - "8006:8006"
+      - '8000:8000'
+      - '8001:8001'
+      - '8003:8003'
+      - '8006:8006'
     environment:
       - BASIC_AUTH_USERNAME=${BASIC_AUTH_USERNAME}
       - BASIC_AUTH_PASSWORD=${BASIC_AUTH_PASSWORD}
@@ -320,18 +319,17 @@ services:
       - server
       - airbyte-api-server
 
-  
   #############################################################################
   # Postgre
   #############################################################################
 
   postgre:
-    container_name: "${COMPOSE_PROJECT_NAME:-postgre}"
-    image: "postgres:12.16"
+    container_name: '${COMPOSE_PROJECT_NAME:-postgre}'
+    image: 'postgres:12.16'
     ports:
-      - "5432:5432"
+      - '5436:5432'
     labels:
-      - "com.citusdata.role=Master"
+      - 'com.citusdata.role=Master'
     environment: &AUTH
       - POSTGRES_PASSWORD=pass
       - POSTGRES_USER=postgres
@@ -344,18 +342,17 @@ services:
       - ./postgre-data/:/var/lib/postgresql/data/
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
-  
   #############################################################################
   # Citus
   #############################################################################
 
   citus-master:
-    container_name: "${COMPOSE_PROJECT_NAME:-citus}_master"
-    image: "citusdata/citus:12.0.0"
+    container_name: '${COMPOSE_PROJECT_NAME:-citus}_master'
+    image: 'citusdata/citus:12.0.0'
     ports:
-      - "${COORDINATOR_EXTERNAL_PORT:-15432}:5432"
+      - '${COORDINATOR_EXTERNAL_PORT:-15432}:5432'
     labels:
-      - "com.citusdata.role=Master"
+      - 'com.citusdata.role=Master'
     environment: &AUTH
       - POSTGRES_PASSWORD=pass
       - POSTGRES_USER=postgres
@@ -368,26 +365,25 @@ services:
       - ./citus-db-data/:/var/lib/postgresql/data/
 
   citus-worker:
-    image: "citusdata/citus:12.0.0"
+    image: 'citusdata/citus:12.0.0'
     labels:
-      - "com.citusdata.role=Worker"
+      - 'com.citusdata.role=Worker'
     depends_on:
       - citus-manager
     environment: *AUTH
-    command: "/wait-for-manager.sh"
+    command: '/wait-for-manager.sh'
     volumes:
       - ./citus-healthcheck:/healthcheck
 
   citus-manager:
-    container_name: "${COMPOSE_PROJECT_NAME:-citus}_manager"
-    image: "citusdata/membership-manager:0.3.0"
+    container_name: '${COMPOSE_PROJECT_NAME:-citus}_manager'
+    image: 'citusdata/membership-manager:0.3.0'
     volumes:
-      - "${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock"
+      - '${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock'
       - ./citus-healthcheck:/healthcheck
     depends_on:
       - citus-master
     environment: *AUTH
-
 
 volumes:
   workspace:
@@ -400,13 +396,11 @@ volumes:
   db:
     name: ${DB_DOCKER_MOUNT}
 
-
 configs:
   flags:
     file: ./flags.yml
 
-
-networks: 
+networks:
   postgres-network:
     driver: bridge
   airbyte_public:
